@@ -1,0 +1,40 @@
+.library-wrapper {
+	height: 85%;
+	background-color: yellow;
+	margin: 0px 5px 0px 50px;
+}
+
+.library {
+	height: 100%;
+}
+
+.playlist {
+	height: 100%;
+	background-color: white; 
+}
+
+.listItem {
+	background-color: #0081cc;
+	border-color: #103b59;
+	border-style: solid;
+	border-width: 1px;
+	padding-left: 10px;
+}
+
+.listItem .title {
+	font-family: 'KoHo', sans-serif;
+	font-size: 20px;
+	margin: 0px;
+}
+
+.listItem .artist {
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 15px;
+	margin: 0px;
+}
+
+.listItem .album {
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 15px;
+	margin: 0px;
+}

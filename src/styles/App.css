@@ -1,0 +1,25 @@
+html {
+	
+}
+
+body {
+	padding-bottom: 13%;
+	margin: 0px;
+	background-color: #33393f;
+	
+}
+
+#root {
+	height: 100%;
+}
+
+.root {
+	height: 100%;
+	background-color: transparent;
+}
+
+.app {
+	background-color: transparent;
+	height: 100%;
+	position: relative;
+}
