@@ -2,7 +2,7 @@ import React from 'react';
 import SongItem from './SongItem';
 import '../styles/Library.css';
 
-const Playlist = ({songs, onClickSong}) => {
+const Playlist = ({songs, filter, search, onClickSong}) => {
 	const playlist = songs.map(song =>
 		<SongItem
 			key={song.id}

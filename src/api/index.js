@@ -20,11 +20,11 @@ const data = {
 		},
 		{
 			id:v4(),
-			title: "Dillagi",
-			artist: "Nusrat Fateh Ali Khan",
-			album: "Nusrat Vol 1",
-			genre: "Qawwali",
-			duration: new Date('01 Jan 1970 00:10:00 GMT'),
+			title: "Sir Kiye",
+			artist: "Strings",
+			album: "Door",
+			genre: "Pop",
+			duration: new Date('01 Jan 1970 00:03:00 GMT'),
 		},
 		{
 			id:v4(),

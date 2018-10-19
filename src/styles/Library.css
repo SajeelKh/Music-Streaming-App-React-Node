@@ -1,6 +1,5 @@
 .library-wrapper {
 	height: 85%;
-	background-color: yellow;
 	margin: 0px 5px 0px 50px;
 }
 
@@ -15,9 +14,7 @@
 
 .listItem {
 	background-color: #0081cc;
-	border-color: #103b59;
-	border-style: solid;
-	border-width: 1px;
+	border: 1px solid #103b59;
 	padding-left: 10px;
 }
 
@@ -37,4 +34,29 @@
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 15px;
 	margin: 0px;
+}
+
+.artistList {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	
+}
+
+.artistItem {
+	width: 22vw;
+	height: 22vh;
+	margin: 5px 0px 5px 10px;
+	background-color: #0081cc;
+	border: 1px solid #103b59;
+	text-align: center;
+	justify-items: left;
+}
+
+.artistItem .artistImg {
+	float: left;
+	height: 100%;
+	width: 50%;
 }
