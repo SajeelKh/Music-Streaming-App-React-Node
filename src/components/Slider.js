@@ -83,6 +83,10 @@ class Slider extends Component{
 						this.props.updateTime(this.now);
 					}
 					else{
+						this.count += 1;
+						this.now = parseInt(this.duration - this.count);
+						this.props.updateTime(this.now);
+						ele.style.left = ele.parentNode.offsetWidth + "px";
 						//ele.style.left = 0 + "px";
 						clearInterval(this.funct);
 						this.setState((prevState) => ({
@@ -109,8 +113,10 @@ class Slider extends Component{
 			<div 
 				id="ball"
 				style = {{fontSize:'50%'}}
+				onDragStart = {()=>console.log("Drag Start")}
 			>
-				{this.now}
+				<img></img>
+				{/* {this.now} */}
 			</div>
 		)
 	}

@@ -4,7 +4,7 @@ import * as actions from '../actions';
 import Playlist from '../components/Playlist';
 import ArtistList from '../components/ArtistList';
 import {getSongs} from '../reducers';
-import {withRouter} from 'react-router-dom';
+import {Route, withRouter} from 'react-router-dom';
 import '../styles/Library.css';
 
 class Library extends Component{
@@ -69,6 +69,7 @@ class Library extends Component{
 						<ArtistList
 							artistList={artistList}
 							songsByArtist={songsByArtist}
+							onClickSong={playSong}
 						/>
 					</div>
 				</div>

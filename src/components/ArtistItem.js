@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
 import Playlist from './Playlist';
+import FilterLink from '../containers/FilterLink';
+import SongItem from './SongItem';
 
 class ArtistItem extends Component {
     handleClick = () => {
-        // this.render = () => <Playlist songs={this.props.songs} />
-        // this.forceUpdate();
+        const {name, songs, onClickSong} = this.props;
+        this.render = () => <Playlist songs={songs} onClickSong={onClickSong}/>
+        this.forceUpdate();
     }
 
     // componentDidMount(){
@@ -16,11 +19,15 @@ class ArtistItem extends Component {
     // }
 
     render(){
-        const {name, songs} = this.props;
+        const {name, songs, onClickSong} = this.props;
         return (
-            <div className="artistItem" onClick={() => this.handleClick()}>
-                <img className="artistImg"></img>
-                <p>{name}</p>
+            <div>
+                <FilterLink filter={'artist/songs'}>
+                    <div className="artistItem" onClick={() => this.handleClick()}>
+                        <img className="artistImg"></img>
+                        <p>{name}</p>
+                    </div>
+                </FilterLink>
             </div>
         );
     }
