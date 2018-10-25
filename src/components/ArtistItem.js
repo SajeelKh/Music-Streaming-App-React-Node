@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
+import {Link, Redirect, withRouter, Switch} from 'react-router-dom';
 import Playlist from './Playlist';
 import FilterLink from '../containers/FilterLink';
 import SongItem from './SongItem';
 
 class ArtistItem extends Component {
     handleClick = () => {
-        const {name, songs, onClickSong} = this.props;
-        this.render = () => <Playlist songs={songs} onClickSong={onClickSong}/>
-        this.forceUpdate();
+        const {songs, onClickSong} = this.props;
+        <Redirect from='/artist' to='/artist/:name' />
     }
 
     // componentDidMount(){
@@ -19,18 +19,29 @@ class ArtistItem extends Component {
     // }
 
     render(){
-        const {name, songs, onClickSong} = this.props;
+        const {name, songs, onClickSong, match} = this.props;
         return (
-            <div>
-                <FilterLink filter={'artist/songs'}>
-                    <div className="artistItem" onClick={() => this.handleClick()}>
-                        <img className="artistImg"></img>
-                        <p>{name}</p>
-                    </div>
-                </FilterLink>
-            </div>
+        <React.Fragment>
+            <Link 
+                to={{
+                        pathname:`${match.path}/${name}`,
+                        state: {
+                            songs
+                        }
+                    }
+                } onClick={this.handleClick}>
+                
+                <div className="artistItem">
+                    <img className="artistImg"></img>
+                    <p>{name}</p>
+                </div>
+
+            </Link>
+        </React.Fragment>
         );
     }
 }
+
+ArtistItem = withRouter(ArtistItem);
 
 export default ArtistItem;

@@ -12,7 +12,7 @@ const Root = () => (
 	<div className="root">
 		<Provider store = {store}>
 			<BrowserRouter>
-				<Route exact path={'/:filter?/:search?'} component={App}/>
+				<Route path={'/:filter?/:search?'} component={App}/>
 			</BrowserRouter>
 		</Provider>
 	</div>
