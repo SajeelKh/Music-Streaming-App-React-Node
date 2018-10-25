@@ -62,13 +62,12 @@ class Library extends Component{
 						</div>)}
 						/>
 
-					<Route path='/artist' render={() => (
-						<div className="library">
+					<Route exact path='/artist' render={() => (
+						<div className="artistList">
 							<ArtistList
 								artistList={artistList}
 								songsByArtist={songsByArtist}
 								onClickSong={playSong}
-								className="artistList"
 							/>
 						</div>)}
 						/>

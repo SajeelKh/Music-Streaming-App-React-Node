@@ -9,12 +9,12 @@ let ArtistList = ({artistList, songsByArtist, onClickSong, location}) => {
     return (
         <React.Fragment>
             <Switch>
-                <Route path='/artist/:name' render = {() => 
+                {/* <Route path='/artist/:name' render = {() => 
                     <Playlist
 						songs={location.state.songs}
 						onClickSong={onClickSong}
 					/>}
-                />
+                /> */}
 
                 <Route path='/artist' render = {() => 
                     keys.map(key => 
