@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
-import Root from './components/Root';
+import Root from './client/components/Root';
 
 ReactDOM.render(
 	<Root />

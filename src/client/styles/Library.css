@@ -46,6 +46,10 @@
 	
 }
 
+.artistList a {
+	text-decoration: none;
+}
+
 .artistItem {
 	width: 22vw;
 	height: 22vh;
