@@ -6,33 +6,32 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const CONFIG = require('./CONFIG');
 const util = require('util');
-const { Readable } = require('stream');
+const { RecursiveDirectorySearch } = require('./directories');
+
  
 let db;
 let bucket;
-let filesArr = [];
-let foldersArr = [''];
 let promisedReaddir = util.promisify(fs.readdir);
 let promisedStat = util.promisify(fs.stat);
 
-function forEachFileStream(files){
+function forEachFileStream(folderPath, files){
 	return new Promise((resolve) => {
 		let promises = files.map(async(file) => {
 			// console.log("forEach");
-			const stats = await promisedStat(path.join(CONFIG.folderPath, file));
+			const stats = await promisedStat(path.join(CONFIG.rootPath, folderPath, file));
 			// console.log("stat");
-			if(path.extname(file) !== '.mp3' && !stats.isDirectory())
+			if(path.extname(file) !== '.mp3' || stats.isDirectory())
 				return;
 
-			if(stats.isDirectory()) {
-				if(foldersArr.indexOf(file) === -1){
-					// console.log(file);
-					foldersArr.push(file);
-					console.log("Array", foldersArr);
-				}
-			}
+			// if(stats.isDirectory()) {
+			// 	if(foldersArr.indexOf(file) === -1){
+			// 		// console.log(file);
+			// 		foldersArr.push(file);
+			// 		console.log("Array", foldersArr);
+			// 	}
+			// }
 			else{
-				return promisedStream(file);
+				return promisedStream(folderPath, file);
 			}
 		});
 		//console.log(promises);
@@ -61,9 +60,9 @@ async function insertSong(metadata){
 	});
 }
 
-async function promisedStream(file){
+async function promisedStream(folderPath, file){
 	return new Promise(async(resolve, reject) => {
-		let readableSongStream = fs.createReadStream(path.join(CONFIG.folderPath, file));
+		let readableSongStream = fs.createReadStream(path.join(CONFIG.rootPath, folderPath, file));
 		let uploadStream = bucket.openUploadStream(file);
 		readableSongStream.pipe(uploadStream);
 
@@ -75,7 +74,7 @@ async function promisedStream(file){
 			console.log("FINISH!");
 			readableSongStream.close();
 			
-			var metadata = await mmd.parseFile(path.join(CONFIG.folderPath, file), {native:true})
+			var metadata = await mmd.parseFile(path.join(CONFIG.rootPath, folderPath, file), {native:true})
 			//console.log(metadata);
 
 			await insertSong(metadata)
@@ -105,24 +104,21 @@ async function connectDatabaseBucket(){
 }
 
 async function uploadSongs(){
-	return new Promise(async(resolve) => {
-		// do {	
-			const files = await promisedReaddir(path.join(CONFIG.folderPath, foldersArr.pop()));
-			console.log("Readdir");
-			//const promises = new PromiseParallelizer();
-			let folders = await getFolders(files);
-			console.log("FOLDERZZZZ:",folders)
-			let promises = await forEachFileStream(files);
-			console.log(promises);
-			Promise.all(promises).then(() => {
-				if(foldersArr.length > 0)
-					uploadSongs()
-				else
-					resolve()
-			});
-			//console.log(foldersArr.length);
-		// }while(foldersArr.length > 0);
-	})
+	let promises = [];
+	let directories = await RecursiveDirectorySearch();
+	async function dirPromises(folderPath){
+		return new Promise(async(resolve) => {
+				const files = await promisedReaddir(path.resolve(CONFIG.rootPath, folderPath));
+				// console.log("Readdir");
+				let promises = await forEachFileStream(folderPath, files);
+				// console.log(promises);
+				await Promise.all(promises);
+				resolve();
+		})
+	}
+	promises = directories.map(folderpath => dirPromises(folderpath));
+	console.log("Promises: ", promises);
+	await Promise.all(promises);
 }
 
 async function initialize(){

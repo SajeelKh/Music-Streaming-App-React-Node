@@ -9,7 +9,7 @@ let promisedStat = util.promisify(fs.stat);
 async function getFolders(files, pathname){
 	let wait = ms => new Promise(resolve => setTimeout(resolve(), ms));
 	let filter = file => wait(1).then(async() => {
-		let stat = await promisedStat(path.join(CONFIG.folderPath, pathname, file));
+		let stat = await promisedStat(path.join(CONFIG.rootPath, pathname, file));
 		if(stat.isDirectory())
 			return file;
 	});
@@ -32,7 +32,7 @@ async function RecursiveDirectorySearch(){
 	async function CurrDirectorySearch(){
 		currDirectory = path.join(currDirectory, foldersArr.shift());		//concatenate the next dir into curr dir.
 		directoriesArr.push(currDirectory);									//note the directory.
-		let files = await promisedReaddir(path.join(CONFIG.folderPath, currDirectory));	//Search current directory.
+		let files = await promisedReaddir(path.join(CONFIG.rootPath, currDirectory));	//Search current directory.
 		let folders = await getFolders(files, currDirectory);				//get only folders from current directory.
 		tmpArr.unshift(folders);					//push the folders in the array to keep track of the folders of current directory.
 		
@@ -67,3 +67,14 @@ async function RecursiveDirectorySearch(){
 
 	return(directoriesArr);
 }
+
+module.exports = {
+	RecursiveDirectorySearch,
+}
+
+// async function main(){
+// 	let dirs = await RecursiveDirectorySearch();
+// 	dirs.forEach((dir) => console.log(path.join(CONFIG.rootPath, dir)))
+// }
+
+// main();
