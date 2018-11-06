@@ -28,7 +28,7 @@ function forEachFileStream(files){
 				if(foldersArr.indexOf(file) === -1){
 					// console.log(file);
 					foldersArr.push(file);
-					// console.log("Array", foldersArr);
+					console.log("Array", foldersArr);
 				}
 			}
 			else{
@@ -40,66 +40,6 @@ function forEachFileStream(files){
 	});
 }
 
-// class PromiseParallelizer {
-// 	constructor(){
-// 		this.promises = [];
-// 		this.length = 0;
-// 		this.firstPass = true;
-// 	}
-
-// 	push(promise){
-// 		this.promises.push(promise);
-// 		this.length++;
-// 		this.life;
-// 	}
-
-// 	repeat(){
-// 		if(this.promises.length <= 0){
-// 			repeat();
-// 		}
-// 		else
-// 			return;
-// 	}
-
-// 	all(){
-// 		return new Promise((resolve) => {
-// 			if(this.firstPass && this.length === 0){
-// 				this.firstPass = false;
-// 				this.repeat();
-// 				Promise.all(promises).then(() => {
-
-// 				});
-
-// 			}
-
-// 		})
-// 		// return new Promise(async(resolve) => {
-// 		// 	console.log(`Promises: ${this.promises}, ${this.promises.length}`);
-// 		// 	if (this.promises.length === 0){
-// 		// 		console.log("DASDASD");
-// 		// 		await setInterval(() => {
-// 		// 			return new Promise((resolve) => {
-// 		// 				if(this.promises.length > 0)
-// 		// 					resolve();
-// 		// 			})
-
-// 		// 		}, 0)
-// 		// 	}
-
-// 		// 	Promise.all(this.promises).then(async() => {
-// 		// 		await setTimeout(() => {
-// 		// 			return new Promise((resolve) => {
-// 		// 				if(this.promises.length !== this.length)
-// 		// 					this.all()
-// 		// 				resolve();
-// 		// 			})
-// 		// 		},2000)
-// 		// 	})
-// 		// 	resolve();
-// 		// })
-// 	}
-
-// }
 
 async function insertSong(metadata){
 	return new Promise(async(resolve) => {
@@ -133,9 +73,10 @@ async function promisedStream(file){
 
 		uploadStream.on('finish', async() => {
 			console.log("FINISH!");
-
+			readableSongStream.close();
+			
 			var metadata = await mmd.parseFile(path.join(CONFIG.folderPath, file), {native:true})
-			console.log(metadata);
+			//console.log(metadata);
 
 			await insertSong(metadata)
 			resolve();
@@ -165,33 +106,26 @@ async function connectDatabaseBucket(){
 
 async function uploadSongs(){
 	return new Promise(async(resolve) => {
-		// do {
-		// 	console.log("======>",foldersArr);
-			// console.log(path.join(CONFIG.folderPath, foldersArr.pop()));
+		// do {	
 			const files = await promisedReaddir(path.join(CONFIG.folderPath, foldersArr.pop()));
 			console.log("Readdir");
 			//const promises = new PromiseParallelizer();
-			
-
-				
-				// console.log("else");
-					
-				let promises = await forEachFileStream(files);
-				console.log(promises);
-				Promise.all(promises).then(() => resolve());
-				console.log("through");
-				
-				
-				// console.log("Database Ready!");
-			//});
-			
-		// 	console.log('///////',foldersArr.length);
-		// }while(foldersArr.length !== 0);
-	// console.log("HEEELLLLLLLLOOOOOOOOOOO!!!");
+			let folders = await getFolders(files);
+			console.log("FOLDERZZZZ:",folders)
+			let promises = await forEachFileStream(files);
+			console.log(promises);
+			Promise.all(promises).then(() => {
+				if(foldersArr.length > 0)
+					uploadSongs()
+				else
+					resolve()
+			});
+			//console.log(foldersArr.length);
+		// }while(foldersArr.length > 0);
 	})
 }
 
-async function main(){
+async function initialize(){
 	console.log("Wait while we set up the database...");
 	try{
 		await connectDatabaseBucket();
@@ -203,4 +137,8 @@ async function main(){
 	console.log("Database Ready!");
 }
 
-main();
+initialize();
+
+module.exports = {
+	initialize,
+}

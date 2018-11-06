@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "async": "^2.6.1",
     "axios": "^0.18.0",
     "cors": "^2.8.4",
     "express": "^4.16.4",
@@ -22,6 +23,7 @@
   "scripts": {
     "serve": "node src/server/index.js",
     "init": "node src/server/databaseInit.js",
+    "atest": "node src/server/test.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
