@@ -14,15 +14,59 @@ let bucket;
 let promisedReaddir = util.promisify(fs.readdir);
 let promisedStat = util.promisify(fs.stat);
 
-function forEachFileStream(folderPath, files){
+async function removeSingle(filePath, database){
+	db = database;
+	let file = process.platform !== 'win32'?
+				filePath.split("/"):
+				filePath.split("\\");
+	let search = await db.collection('songs.files').find({filename:file[file.length-1]}, { _id: 1 } ).limit(1).toArray();
+	console.log(search);
+
+	bucket.delete(search[0]._id);
+	return;
+}
+
+async function uploadSingle(filePath, database){
+	db = database;
+
+	let file = process.platform !== 'win32'?
+					filePath.split("/"):
+					filePath.split("\\");
+
+	const stats = await promisedStat(filePath);
+	let search = await db.collection('songs.files').find({filename:file[file.length-1]}).toArray();
+	// console.log("stat");
+	if(path.extname(filePath) !== '.mp3' || stats.isDirectory()){
+		throw "Cannot upload, Requested entity is either a folder or not a audio file";
+	}
+	else if(search.length !== 0){
+		// console.log(search);
+		console.log("Already Present");
+		throw "Cannot upload, Requested song already present in database";
+	}
+
+	else{
+		return await promisedStream(filePath);
+	}
+
+}
+
+function uploadSongs(folderPath, files){
 	return new Promise((resolve) => {
 		let promises = files.map(async(file) => {
 			// console.log("forEach");
-			const stats = await promisedStat(path.join(CONFIG.rootPath, folderPath, file));
+			let filePath = path.join(CONFIG.rootPath, folderPath, file);
+			const stats = await promisedStat(filePath);
+			let search = await db.collection('songs.files').find({filename:file}).toArray();
 			// console.log("stat");
-			if(path.extname(file) !== '.mp3' || stats.isDirectory())
+			if(path.extname(file) !== '.mp3' || stats.isDirectory()){
 				return;
-
+			}
+			else if(search.length !== 0){
+				// console.log(search);
+				console.log("Already Present");
+				return;
+			}
 			// if(stats.isDirectory()) {
 			// 	if(foldersArr.indexOf(file) === -1){
 			// 		// console.log(file);
@@ -31,7 +75,7 @@ function forEachFileStream(folderPath, files){
 			// 	}
 			// }
 			else{
-				return promisedStream(folderPath, file);
+				return promisedStream(filePath);
 			}
 		});
 		//console.log(promises);
@@ -40,7 +84,7 @@ function forEachFileStream(folderPath, files){
 }
 
 
-async function insertSong(metadata){
+async function insertSong(file, metadata){
 	return new Promise(async(resolve) => {
 		let song = {
 			duration: metadata.format.duration || 0,
@@ -51,7 +95,7 @@ async function insertSong(metadata){
 		}
 
 		try{
-			 await db.collection('songs').insert(song);
+			await db.collection('songs.files').updateOne({filename: file[file.length-1]}, {$set: song});
 		}
 		catch(err){
 			console.log(`Can't add a record of ${file}`);
@@ -60,81 +104,91 @@ async function insertSong(metadata){
 	});
 }
 
-async function promisedStream(folderPath, file){
+async function promisedStream(filePath){
 	return new Promise(async(resolve, reject) => {
-		let readableSongStream = fs.createReadStream(path.join(CONFIG.rootPath, folderPath, file));
-		let uploadStream = bucket.openUploadStream(file);
-		readableSongStream.pipe(uploadStream);
+		let file = process.platform !== 'win32'?
+					filePath.split("/"):
+					filePath.split("\\");
 
+		let readableSongStream = fs.createReadStream(filePath);
+		let uploadStream = bucket.openUploadStream(file[file.length-1]);
+		readableSongStream.pipe(uploadStream);
+		// console.log("promisedStream");
 		uploadStream.on('error', (err) => {
 			console.log(err, ` Can't upload the song ${file}`);
 		})
 
 		uploadStream.on('finish', async() => {
-			console.log("FINISH!");
+			console.log(`A Song Uploaded ${file[file.length-1]}!`);
 			readableSongStream.close();
 			
-			var metadata = await mmd.parseFile(path.join(CONFIG.rootPath, folderPath, file), {native:true})
+			var metadata = await mmd.parseFile(filePath, {native:true})
 			//console.log(metadata);
 
-			await insertSong(metadata)
+			await insertSong(file, metadata)
 			resolve();
 		})
 	});
 } 
 
-async function connectDatabaseBucket(){
-	return new Promise(resolve => {
-		MongoClient.connect(CONFIG.connString2, (err, client) => {
-		    if(err){
-		        console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
-		        process.exit(1);
-		    }
-		    console.log("Database connected...");
-		    db = client;
+async function connectDatabase(){
+	return new Promise(async resolve => {
+		try{
+        	db = await MongoClient.connect(CONFIG.connString2);
+        	// db = client.db;
+    	}
+	    catch(err){
+	        console.log(err,' :MongoDB Connection Error. Please make sure that MongoDB is running.');
+	        throw "err";
+	        process.exit(1);
+	    }
 
-		    bucket = new mongodb.GridFSBucket(db,
-			    {
-			        bucketName: 'songs',
-			    }
-			);
-			resolve();
-		});
+	    bucket = new mongodb.GridFSBucket(db,
+		    {
+		        bucketName: 'songs',
+		    }
+		);
+		resolve(db);
 	})
 }
 
-async function uploadSongs(){
+async function searchDirectories(){
 	let promises = [];
 	let directories = await RecursiveDirectorySearch();
 	async function dirPromises(folderPath){
 		return new Promise(async(resolve) => {
 				const files = await promisedReaddir(path.resolve(CONFIG.rootPath, folderPath));
 				// console.log("Readdir");
-				let promises = await forEachFileStream(folderPath, files);
+				let promises = await uploadSongs(folderPath, files);
 				// console.log(promises);
 				await Promise.all(promises);
 				resolve();
 		})
 	}
 	promises = directories.map(folderpath => dirPromises(folderpath));
-	console.log("Promises: ", promises);
+	// console.log("Promises: ", promises);
 	await Promise.all(promises);
 }
 
-async function initialize(){
+async function initialize(database){
 	console.log("Wait while we set up the database...");
+	db = database;
 	try{
-		await connectDatabaseBucket();
-		await uploadSongs();
+		await connectDatabase();
+		await searchDirectories();
 	}
 	catch(err){
 		console.log(err);
 	}
 	console.log("Database Ready!");
+	return;
 }
 
-initialize();
+// initialize();
 
 module.exports = {
 	initialize,
+	uploadSingle,
+	connectDatabase,
+	removeSingle,
 }
