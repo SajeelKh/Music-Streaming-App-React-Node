@@ -33,7 +33,7 @@ async function serve(){
 
     require('./routes')(trackRoute, db);
 
-    const forked = fork('src/server/child.js', []);
+    const forked = fork('src/server/watcher.js', []);
 
     app.listen('3005', () => {
         console.log("App listening to port 3005!");

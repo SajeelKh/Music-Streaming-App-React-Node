@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Playlist from '../components/Playlist';
 import ArtistList from '../components/ArtistList';
-import {getSongs} from '../reducers';
+import {getSongs, getNowPlaying} from '../reducers';
 import {Route, withRouter, Switch} from 'react-router-dom';
 import '../styles/Library.css';
 
@@ -49,7 +49,7 @@ class Library extends Component{
 		const {filter, search, songs, playSong} = this.props;
 		const artistList = this.getAllArtists(songs);
 		const songsByArtist = this.getSongsByArtists(artistList, songs);
-
+		console.log("ID: ", this.props.nowPlayingID);
 		return (
 			<div className="library-wrapper">
 				<Switch>
@@ -58,6 +58,7 @@ class Library extends Component{
 							<Playlist
 								songs={songs}
 								onClickSong={playSong}
+								nowPlayingID={this.props.nowPlayingID}
 							/>
 						</div>)}
 						/>
@@ -92,6 +93,7 @@ const mapStateToProps = (state, {match}) => {
 	const search = match.params.search;
 	return {
 		songs: getSongs(state),
+		nowPlayingID: getNowPlaying(state)._id || 0,
 		filter,
 		search,
 	}

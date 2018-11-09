@@ -20,8 +20,8 @@ module.exports = function(trackRoute, db){
 	    //res.set('accept-ranges', 'bytes');
 
 	    db.collection("songs.files").find({}).toArray((err, docs) => {
-	        console.log("------------------------------------------------");
-	        console.log(docs);
+	        // console.log("------------------------------------------------");
+	        // console.log(docs);
 	        res.send(docs);
 	        //res.end();
 	    });

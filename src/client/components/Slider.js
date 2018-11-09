@@ -15,15 +15,15 @@ class Slider extends Component{
 	}
 	componentDidMount(){
 		// this.bound = document.getElementsByClassName("SeekSlider")[0].getBoundingClientRect().width;
-		this.duration = Math.round(this.props.duration/1000);
-		console.log(this.props.duration/1000);
+		this.duration = Math.round(this.props.duration);
+		console.log(this.props.duration);
 		this.bound = document.getElementById("ball").parentNode.offsetWidth;
 
 		window.addEventListener('resize', this.handleResize);
 	}
 
 	componentDidUpdate(){
-		this.duration = Math.round(this.props.duration/1000);
+		this.duration = Math.round(this.props.duration);
 	}
 
 	componentWillUnmount(){

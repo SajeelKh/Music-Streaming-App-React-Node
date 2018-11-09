@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import axios from 'axios';
 import {getNowPlaying} from '../reducers';
 import SeekSlider from '../components/SeekSlider';
 import NowPlaying from '../components/NowPlaying';
 import PlayButton from '../components/PlayButton';
+// import Audio from '../components/Audio';
 import '../styles/MusicBar.css';
 
 class MusicBar extends Component {
@@ -11,23 +13,81 @@ class MusicBar extends Component {
 		super(props);
 		this.state = {
 			isPlaying: false,
+			nowPlayingURL: null,
 			volume: 50,
-			song: '...',
-			position: '0:00',
+			position: 0,
 		}
+		this.Audio = new Audio();
+		this.audioPlayer
+		this.timer = null;
 		this.PlayButtonHandler = this.PlayButtonHandler.bind(this);
+		this.getNowPlayingURL = this.getNowPlayingURL.bind(this);
+	}
+
+	componentDidUpdate(prevProps){
+		if(!this.state.isPlaying){
+			clearInterval(this.timer);
+		}
+
+		if(prevProps.nowPlaying._id !== this.props.nowPlaying._id){
+			this.setState(()=>({
+				nowPlayingURL: this.getNowPlayingURL(),
+			}));
+
+			clearInterval(this.timer);
+		}
+
+
 	}
 
 	componentWillReceiveProps(nextProps){
-		if(nextProps.nowPlaying.id !== this.props.nowPlaying.id){
+		if(nextProps.nowPlaying._id !== this.props.nowPlaying._id){
 			this.setState((prevState) => ({
-				isPlaying : !prevState
+				isPlaying : !prevState,
 			}));
 		}
 	}
 
 	PlayButtonHandler(){
-		this.setState({isPlaying : !this.state.isPlaying});
+		console.log('src: ',this.Audio.src);
+		if(this.Audio.src){
+			this.setState((prevState) => ({
+				isPlaying : !prevState.isPlaying
+			}));
+
+			if(this.state.isPlaying){
+				this.Audio.pause();
+			}
+			else{
+				this.Audio.play();
+				this.timer = setInterval(() => {
+					this.setState((prevState) => ({
+						position: this.Audio.currentTime,
+					}))
+				},1000);
+			}
+		}
+	}
+
+	getNowPlayingURL(){
+		if(Object.keys(this.props.nowPlaying).length === 0 && this.props.nowPlaying.constructor === Object){
+			return null;
+		}
+		else{
+			this.Audio.src = `http://localhost:3005/tracks/${this.props.nowPlaying._id}`;
+			return `http://localhost:3005/tracks/${this.props.nowPlaying._id}`;
+		}
+	}
+
+	remainingTime(){
+		let currTime;
+		if(this.Audio){
+			currTime = this.Audio.currentTime;
+			return currTime;
+		}
+		else{
+			return 0;
+		}
 	}
 
 	render(){
@@ -38,10 +98,14 @@ class MusicBar extends Component {
 		return (
 			<div className="musicbar-wrapper">
 				<div className="MusicBar">
+					{/*<Audio 
+						source={this.state.nowPlayingURL}
+					/>*/}
 					<SeekSlider
 						song = {songId}
 						duration={duration} 
 						isPlaying = {this.state.isPlaying}
+						remainingTime = {this.remainingTime()}
 					/>
 					<NowPlaying
 						{...nowPlaying}

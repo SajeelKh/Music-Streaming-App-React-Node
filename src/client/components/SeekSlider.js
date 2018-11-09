@@ -12,6 +12,12 @@ class SeekSlider extends Component {
 		this.getTimeFromS = this.getTimeFromS.bind(this);
 		this.updateTime = this.updateTime.bind(this);
 	}
+
+	componentWillReceiveProps(nextProps){
+		this.setState(() => ({
+			remainingTime: nextProps.remainingTime,
+		}));
+	}
 	
 	getTimeFromMS(ms){
 		var minutes = Math.floor(ms / 60000);
@@ -26,10 +32,9 @@ class SeekSlider extends Component {
 	}
 
 	updateTime(time){
-		this.setState({
-			remainingTime: time,
-		});
-		
+		this.setState((prevState) => ({
+			remainingTime: this.props.remainingTime,
+		}));
 	}
 
 	render(){
@@ -45,7 +50,7 @@ class SeekSlider extends Component {
 				/>
 				<p className="remainingTimeTag">{this.getTimeFromS(this.state.remainingTime)}</p>
 				
-				<p className="totalTimeTag">{this.getTimeFromMS(duration)}</p>
+				<p className="totalTimeTag">{this.getTimeFromS(duration)}</p>
 			</div>
 		);
 	}

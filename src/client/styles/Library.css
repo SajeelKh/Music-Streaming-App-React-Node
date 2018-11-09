@@ -1,5 +1,5 @@
 .library-wrapper {
-	height: 85%;
+	height: 100%;
 	margin: 0px 5px 0px 50px;
 }
 
@@ -16,6 +16,7 @@
 	background-color: #0081cc;
 	border: 1px solid #103b59;
 	padding-left: 10px;
+	position: relative;
 }
 
 .listItem .title {
@@ -34,6 +35,16 @@
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 15px;
 	margin: 0px;
+}
+
+.listItem .nowPlayingInd {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translate(0%, -50%);
+    color: black;
+    z-index: 1;
+    font-size: 30px;
 }
 
 .artistList {

@@ -1,6 +1,7 @@
 const chokidar = require('chokidar');
 const CONFIG = require('./CONFIG');
 const database = require('./databaseInit');
+const pathMod = require('path');
 var log = console.log.bind(console);
 
 async function main(){
@@ -19,6 +20,10 @@ async function main(){
 		ignored: /(^|[\/\\])\../,
 		persistent: true,
 		ignoreInitial: true,
+		awaitWriteFinish: {
+		    stabilityThreshold: 2000,
+		    pollInterval: 100,
+	  	},
 	});
 
 	watcher
@@ -28,7 +33,16 @@ async function main(){
 			.then(() => log(`File ${path} has been uploaded`))
 			.catch((err) => log(`${err}: File ${path} could not be uploaded`))  		
 		})
-		.on('change', path => log(`File ${path} has been changed`))
+		.on('change', path => {
+			log(`File ${path} has been changed`);
+			if(pathMod.extname(path) === '.mp3') {
+				database.removeSingle(path, db).then(() => {
+					database.uploadSingle(path, db);
+				} ).catch((err) => {
+					log(`${err}: File ${path} could not be updated on the database.`);
+				})
+			}
+		})
 		.on('unlink', path => {
 			log(`File ${path} has been removed from directory`);
 			database.removeSingle(path, db)

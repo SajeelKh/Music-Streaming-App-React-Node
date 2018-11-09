@@ -4,8 +4,8 @@ const songs = (state={}, action) => {
 	switch(action.type){
 		case 'RECEIVE_SONGS':
 			const nextState = {...state};
-			action.response.forEach(song => {
-				nextState[song.id] = song;
+			action.response.data.forEach(song => {
+				nextState[song._id] = song;
 			});
 			return nextState;
 		default:
@@ -16,7 +16,7 @@ const songs = (state={}, action) => {
 const allIds = (state = [], action) => {
 	switch(action.type){
 		case 'RECEIVE_SONGS':
-			return action.response.map(song => song.id);
+			return action.response.data.map(song => song._id);
 		default:
 			return state;
 	}

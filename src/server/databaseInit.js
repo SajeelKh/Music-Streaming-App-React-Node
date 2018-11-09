@@ -20,9 +20,9 @@ async function removeSingle(filePath, database){
 				filePath.split("/"):
 				filePath.split("\\");
 	let search = await db.collection('songs.files').find({filename:file[file.length-1]}, { _id: 1 } ).limit(1).toArray();
-	console.log(search);
+	// console.log(search);
 
-	bucket.delete(search[0]._id);
+	await bucket.delete(search[0]._id);
 	return;
 }
 
@@ -41,7 +41,7 @@ async function uploadSingle(filePath, database){
 	}
 	else if(search.length !== 0){
 		// console.log(search);
-		console.log("Already Present");
+		console.log(`${filePath} Already Present in the database.`);
 		throw "Cannot upload, Requested song already present in database";
 	}
 
