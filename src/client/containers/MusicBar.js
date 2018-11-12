@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import axios from 'axios';
 import {getNowPlaying} from '../reducers';
 import SeekSlider from '../components/SeekSlider';
+import Slider2 from '../components/Slider2';
 import NowPlaying from '../components/NowPlaying';
 import PlayButton from '../components/PlayButton';
 // import Audio from '../components/Audio';
@@ -16,15 +17,24 @@ class MusicBar extends Component {
 			nowPlayingURL: null,
 			volume: 50,
 			position: 0,
+			timeupdateListening: true,
 		}
 		this.Audio = new Audio();
 		this.audioPlayer
 		this.timer = null;
-		this.PlayButtonHandler = this.PlayButtonHandler.bind(this);
-		this.getNowPlayingURL = this.getNowPlayingURL.bind(this);
+		// this.PlayButtonHandler = this.PlayButtonHandler.bind(this);
+		// this.getNowPlayingURL = this.getNowPlayingURL.bind(this);
 	}
 
-	componentDidUpdate(prevProps){
+	componentDidMount(){
+		this.Audio.addEventListener("timeupdate", this.handleCurrentTime);
+	}
+
+	componentWillUnmount(){
+		this.Audio.removeEventListener("timeupdate", this.handleCurrentTime);
+	}
+
+	componentDidUpdate(prevProps) {
 		if(!this.state.isPlaying){
 			clearInterval(this.timer);
 		}
@@ -33,11 +43,20 @@ class MusicBar extends Component {
 			this.setState(()=>({
 				nowPlayingURL: this.getNowPlayingURL(),
 			}));
-
+			this.Audio.load();
+			this.Audio.preload = 'auto';
+			// document.getElementsByTagName('AUDIO')[0].load();
+			// document.getElementsByTagName('AUDIO')[0].preload = 'auto';
 			clearInterval(this.timer);
 		}
+		// console.log("Buffered: ",document.getElementsByTagName('AUDIO')[0].buffered);
+		let buff = this.Audio.buffered;
+		// console.log(buff);
 
-
+		// if(buff.length !== 0){
+		// 	console.log(buff.start(0));
+		// 	console.log(buff.end(0));
+		// }
 	}
 
 	componentWillReceiveProps(nextProps){
@@ -48,7 +67,7 @@ class MusicBar extends Component {
 		}
 	}
 
-	PlayButtonHandler(){
+	PlayButtonHandler = () => {
 		console.log('src: ',this.Audio.src);
 		if(this.Audio.src){
 			this.setState((prevState) => ({
@@ -60,16 +79,41 @@ class MusicBar extends Component {
 			}
 			else{
 				this.Audio.play();
-				this.timer = setInterval(() => {
-					this.setState((prevState) => ({
-						position: this.Audio.currentTime,
-					}))
-				},1000);
+				// this.timer = setInterval(() => {
+				// 	this.setState((prevState) => ({
+				// 		position: this.Audio.currentTime,
+				// 	}))
+				// },1000);
 			}
 		}
 	}
 
-	getNowPlayingURL(){
+	handleCurrentTime = () => {
+		this.setState((prevState) => ({
+			position: this.Audio.currentTime,
+		}));
+	}
+
+	setCurrentTime = (time) => {
+		this.Audio.currentTime = time;
+	}
+
+	toggleTimeUpdateListening = () => {
+		if(this.state.timeupdateListening){
+			this.Audio.removeEventListener("timeupdate", this.handleCurrentTime);
+			this.setState(() => ({
+				timeupdateListening: false,
+			}));
+		}
+		else{
+			this.Audio.addEventListener("timeupdate", this.handleCurrentTime);
+			this.setState(() => ({
+				timeupdateListening: true,
+			}));
+		}
+	}
+
+	getNowPlayingURL = () => {
 		if(Object.keys(this.props.nowPlaying).length === 0 && this.props.nowPlaying.constructor === Object){
 			return null;
 		}
@@ -79,16 +123,16 @@ class MusicBar extends Component {
 		}
 	}
 
-	remainingTime(){
-		let currTime;
-		if(this.Audio){
-			currTime = this.Audio.currentTime;
-			return currTime;
-		}
-		else{
-			return 0;
-		}
-	}
+	// remainingTime(){
+	// 	let currTime;
+	// 	if(this.Audio){
+	// 		currTime = this.Audio.currentTime;
+	// 		return currTime;
+	// 	}
+	// 	else{
+	// 		return 0;
+	// 	}
+	// }
 
 	render(){
 		const {nowPlaying} = this.props;
@@ -97,15 +141,26 @@ class MusicBar extends Component {
 
 		return (
 			<div className="musicbar-wrapper">
+			{/*<audio src={this.getNowPlayingURL()} type="audio/mp3" controls />*/}
 				<div className="MusicBar">
 					{/*<Audio 
 						source={this.state.nowPlayingURL}
 					/>*/}
+					<Slider2
+						isPlaying = {this.state.isPlaying}
+						duration={duration}
+						position = {this.state.position}
+						playButtonToggle={this.PlayButtonHandler}
+						setCurrentTime={this.setCurrentTime}
+						toggleListener={this.toggleTimeUpdateListening}
+					/>
 					<SeekSlider
 						song = {songId}
-						duration={duration} 
+						duration={duration}
 						isPlaying = {this.state.isPlaying}
-						remainingTime = {this.remainingTime()}
+						position = {this.state.position}
+						pause={this.PlayButtonHandler}
+						setCurrentTime={this.setCurrentTime}
 					/>
 					<NowPlaying
 						{...nowPlaying}

@@ -17,24 +17,33 @@
 	border: 1px solid #103b59;
 	padding-left: 10px;
 	position: relative;
+	white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .listItem .title {
 	font-family: 'KoHo', sans-serif;
 	font-size: 20px;
 	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .listItem .artist {
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 15px;
 	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .listItem .album {
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 15px;
 	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .listItem .nowPlayingInd {

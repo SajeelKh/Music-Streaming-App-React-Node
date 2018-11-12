@@ -37,6 +37,7 @@ module.exports = function(trackRoute, db){
 
 	    res.set('content-type', 'audio/mp3');
 	    res.set('accept-ranges', 'bytes');
+	    // res.set('Transfer-Encoding', 'chunked');
 
 	    let bucket = new mongodb.GridFSBucket(db,
 	        {
@@ -46,7 +47,22 @@ module.exports = function(trackRoute, db){
 
 	    let downloadStream = bucket.openDownloadStream(trackID);
 
+	    // downloadStream.pipe(res);
+	    let accChunks = 0;
+	    let fileLength = 0;
+
+	    downloadStream.on('file', (file) => {
+	    	console.log(file);
+	    	fileLength = file.length;
+	    	res.set('content-length', file.length);
+	    });
+
 	    downloadStream.on('data', (chunk) => {
+	    	console.log("Sent chunk: ", chunk.length);
+	    	let bt = 'bytes ' + accChunks + '-' + (accChunks+chunk.length) + '/' + fileLength;
+	    	// console.log("BT: ", bt);
+			// res.set('content-range', 'bytes ' + accChunks + '-' + (accChunks+chunk.length) + '/' + fileLength);
+
 	        res.write(chunk);
 	    });
 
@@ -57,6 +73,9 @@ module.exports = function(trackRoute, db){
 	    downloadStream.on('end', () => {
 	        res.end();
 	    });
+
+	    // let readableSongStream = fs.createReadStream("C:\\Users\\Sajeel\\Music\\Demons - Imagine Dragons.mp3");
+	    // readableSongStream.pipe(res);
 	});
 
 	trackRoute.post('/', (req, res) => {
