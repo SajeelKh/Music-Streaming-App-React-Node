@@ -54,9 +54,9 @@ class Slider2 extends Component{
 			this.setState(() => ({
 				dragging: false,
 			}));
-			if(event.nativeEvent){
-				this.thumb.style.left = event.nativeEvent.offsetX + 'px';
-			}
+			// if(event.nativeEvent){
+			// 	this.thumb.style.left = event.nativeEvent.offsetX + 'px';
+			// }
 			var clickPosition = (event.clientX  - this.track.getBoundingClientRect().left) / this.track.offsetWidth;
 			var clickTime = clickPosition * this.props.duration;
 			console.log("PageX", event.pageX);
@@ -67,7 +67,20 @@ class Slider2 extends Component{
 		}
 	}
 
+	getTimeFromMS = (ms) => {
+		var minutes = Math.floor(ms / 60000);
+		var seconds = ((ms % 60000) / 1000).toFixed(0);
+		return (seconds == 60 ? (minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+	}
+
+	getTimeFromS = (s) => {
+		var minutes = Math.floor(s / 60);
+		var seconds = (s % 60).toFixed(0);
+		return (seconds == 60 ? (minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+	}
+
 	render(){
+		let { duration, position } = this.props;
 		return (
 			<div id="slider2">
 				<div id="track2"
@@ -83,6 +96,8 @@ class Slider2 extends Component{
 						<div id="trail2" />
 					</div>
 				</div>
+				<p className="remainingTimeTag">{this.getTimeFromS(position)}</p>
+				<p className="totalTimeTag">{this.getTimeFromS(duration)}</p>
 			</div>
 		);
 	}

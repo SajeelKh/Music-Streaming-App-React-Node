@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import axios from 'axios';
-import {getNowPlaying} from '../reducers';
+import {getNowPlaying, getSongs} from '../reducers';
+import { playSong } from '../actions';
 import SeekSlider from '../components/SeekSlider';
 import Slider2 from '../components/Slider2';
 import NowPlaying from '../components/NowPlaying';
 import PlayButton from '../components/PlayButton';
+import VolumeSlider from '../components/VolumeSlider';
 // import Audio from '../components/Audio';
 import '../styles/MusicBar.css';
+import albumArt from '../public/AlbumArt.svg';
 
 class MusicBar extends Component {
 	constructor(props){
@@ -15,7 +18,10 @@ class MusicBar extends Component {
 		this.state = {
 			isPlaying: false,
 			nowPlayingURL: null,
-			volume: 50,
+			volume: 0.5,
+			muted: false,
+			looping: false,
+			shuffle: false,
 			position: 0,
 			timeupdateListening: true,
 		}
@@ -28,10 +34,12 @@ class MusicBar extends Component {
 
 	componentDidMount(){
 		this.Audio.addEventListener("timeupdate", this.handleCurrentTime);
+		this.Audio.addEventListener("ended", this.handleSongEnd);
 	}
 
 	componentWillUnmount(){
 		this.Audio.removeEventListener("timeupdate", this.handleCurrentTime);
+		this.Audio.addEventListener("ended", this.handleSongEnd);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -43,6 +51,8 @@ class MusicBar extends Component {
 			this.setState(()=>({
 				nowPlayingURL: this.getNowPlayingURL(),
 			}));
+			this.Audio.volume = this.state.volume;
+			this.Audio.muted = this.state.muted;
 			this.Audio.load();
 			this.Audio.preload = 'auto';
 			// document.getElementsByTagName('AUDIO')[0].load();
@@ -123,16 +133,67 @@ class MusicBar extends Component {
 		}
 	}
 
-	// remainingTime(){
-	// 	let currTime;
-	// 	if(this.Audio){
-	// 		currTime = this.Audio.currentTime;
-	// 		return currTime;
-	// 	}
-	// 	else{
-	// 		return 0;
-	// 	}
-	// }
+	changeVolume = (value) => {
+		console.log("Volume: ",value)
+		this.setState({
+			volume: value,
+		},() => {
+			this.Audio.volume = this.state.volume;
+		});
+	}
+
+	toggleMute = () => {
+		this.setState({
+			muted: !this.state.muted,
+		}, () => {
+			this.Audio.muted = this.state.muted;
+		});	
+	}
+
+	handleSongEnd = () => {
+		if(this.state.looping && this.state.shuffle){
+			let index = Math.floor(Math.random() * Math.floor(this.props.songs.length + 1));
+			let id = this.props.songs[index]._id;
+			this.props.playSong(id);
+			this.Audio.play();
+			return;
+		}
+
+		if(!this.state.looping && !this.state.shuffle) {
+			this.setState(() => ({
+				isPlaying: false,
+			}));
+			return;
+		}
+
+		if(!this.state.looping) {
+			this.setState(() => ({
+				isPlaying: false,
+			}));
+		}
+
+		if(this.state.shuffle) {
+			let index = Math.floor(Math.random() * Math.floor(this.props.songs.length + 1));
+			let id = this.props.songs[index]._id;
+			this.props.playSong(id);
+		}
+
+		else if(this.state.looping) {
+			this.Audio.play();
+		}
+	}
+
+	toggleLoop = () => {
+		this.setState((prevState) => ({
+			looping: !prevState.looping,
+		}));
+	}
+
+	toggleShuffle = () => {
+		this.setState((prevState) => ({
+			shuffle: !prevState.shuffle,
+		}));
+	}
 
 	render(){
 		const {nowPlaying} = this.props;
@@ -141,11 +202,18 @@ class MusicBar extends Component {
 
 		return (
 			<div className="musicbar-wrapper">
-			{/*<audio src={this.getNowPlayingURL()} type="audio/mp3" controls />*/}
+
+				<img className="albumart" src={albumArt} alt="Album art"></img>
+				{/*<audio src={this.getNowPlayingURL()} type="audio/mp3" controls />*/}
 				<div className="MusicBar">
 					{/*<Audio 
 						source={this.state.nowPlayingURL}
 					/>*/}
+
+					<NowPlaying
+						{...nowPlaying}
+					/>
+					
 					<Slider2
 						isPlaying = {this.state.isPlaying}
 						duration={duration}
@@ -154,23 +222,33 @@ class MusicBar extends Component {
 						setCurrentTime={this.setCurrentTime}
 						toggleListener={this.toggleTimeUpdateListening}
 					/>
-					<SeekSlider
+					{/* <SeekSlider
 						song = {songId}
 						duration={duration}
 						isPlaying = {this.state.isPlaying}
 						position = {this.state.position}
 						pause={this.PlayButtonHandler}
 						setCurrentTime={this.setCurrentTime}
-					/>
-					<NowPlaying
-						{...nowPlaying}
-					/>
+					/> */}
+				
+
 					<PlayButton
 						song = {songId}
 						isPlaying = {this.state.isPlaying}
 						onClick = {this.PlayButtonHandler}
 					/>
+
+					<VolumeSlider 
+						changeVolume={this.changeVolume}
+						muted={this.state.muted}
+						toggleMute={this.toggleMute}
+						toggleLoop={this.toggleLoop}
+						looping={this.state.looping}
+						shuffle = {this.state.shuffle}
+						toggleShuffle = {this.toggleShuffle}
+					/>
 				</div>
+
 			</div>
 		);
 	}
@@ -179,9 +257,10 @@ class MusicBar extends Component {
 const mapStateToProps = (state) => {
 	return {
 		nowPlaying: getNowPlaying(state),
+		songs: getSongs(state),
 	}
 }
 
-MusicBar = connect(mapStateToProps,)(MusicBar);
+MusicBar = connect(mapStateToProps, {playSong,})(MusicBar);
 
 export default MusicBar;

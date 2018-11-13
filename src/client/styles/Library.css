@@ -20,22 +20,21 @@
 	white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+    font-weight: bold;
+    transition-property: color, background-color, border-color;
+	transition-duration: .3s;
+	transition-timing-function: ease-in;
 }
 
-.listItem .title {
-	font-family: 'KoHo', sans-serif;
-	font-size: 20px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
+.listItem:hover {
+	border-color: black;
+	background-color: black;
+	color: #0081cc;
 }
 
-.listItem .artist {
-	font-family: 'Josefin Sans', sans-serif;
-	font-size: 15px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
+.listItem:hover img:not(:hover) {
+    filter: contrast(0%);
 }
 
 .listItem .album {
@@ -46,14 +45,15 @@
     text-overflow: ellipsis;
 }
 
+@media screen and (min-width: 480px) {
 .listItem .nowPlayingInd {
     position: absolute;
     right: 25px;
     top: 50%;
     transform: translate(0%, -50%);
     color: black;
-    z-index: 1;
     font-size: 30px;
+}
 }
 
 .artistList {
@@ -84,4 +84,65 @@
 	float: left;
 	height: 100%;
 	width: 50%;
+}
+
+@media screen and (max-width: 480px) {
+
+.listItem .nowPlayingInd {
+	display: inline;
+	color: black;
+	z-index: 0;
+	font-size: 30px;
+	height: 30px;
+	width: 35px;
+	padding-left: 10px;
+	float: right;
+}
+
+.listItem .title {
+	font-family: 'KoHo', sans-serif;
+	font-size: 20px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline;
+}
+
+.listItem .artist {
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 15px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+}
+
+@media screen and (min-width: 480px) {
+
+.listItem .nowPlayingInd {
+	display: inline;
+	color: black;
+	font-size: 30px;
+}
+
+.listItem .title {
+	font-family: 'KoHo', sans-serif;
+	font-size: 20px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline;
+}
+
+
+.listItem .artist {
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 15px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 }

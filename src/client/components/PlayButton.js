@@ -1,21 +1,19 @@
 import React, {Component} from 'react';
 
-class PlayButton extends Component {
-	constructor(props){
-		super(props);
-
-	}
-
-	render(){
-		return (
+const PlayButton = ({isPlaying, onClick}) => {
+	// const handleShuffleClick
+	
+	return (
+		<div>
 			<button 
 				className="PlayButton"
-				onClick={this.props.onClick}
+				onClick={onClick}
 			>
-					{this.props.isPlaying?<i className="fas fa-pause"></i>:<i className="fas fa-play"></i>}
+					{isPlaying?<i className="fas fa-pause"></i>:<i className="fas fa-play"></i>}
 			</button>
-		);
-	}
+		</div>
+	);
+
 }
 
 export default PlayButton;
