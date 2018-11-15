@@ -86,13 +86,25 @@ function uploadSongs(folderPath, files){
 
 async function insertSong(file, metadata){
 	return new Promise(async(resolve) => {
+		let albumArt;
+
+		if(metadata.common.picture){
+			let data = "data:" + metadata.common.picture[0].format;
+			let encoding = "charset=utf-8";
+			let image = metadata.common.picture[0].data.toString('base64');
+			albumArt = `${data};${encoding};base64,${image}`;
+		}
+
 		let song = {
 			duration: metadata.format.duration || 0,
 			title: metadata.common.title || 'Unknown',
 			artist: metadata.common.albumartist || 'Unknown',
 			album: metadata.common.album || 'Unknown',
 			genre: metadata.common.genre || 'Unknown',
+			picture: metadata.common.picture ? albumArt : undefined,
 		}
+
+		// console.log("Song: ", song.picture);
 
 		try{
 			await db.collection('songs.files').updateOne({filename: file[file.length-1]}, {$set: song});

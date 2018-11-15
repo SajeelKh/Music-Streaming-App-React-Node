@@ -203,7 +203,7 @@ class MusicBar extends Component {
 		return (
 			<div className="musicbar-wrapper">
 
-				<img className="albumart" src={albumArt} alt="Album art"></img>
+				<img className="albumart" src={nowPlaying.picture || albumArt} alt="Album art"></img>
 				{/*<audio src={this.getNowPlayingURL()} type="audio/mp3" controls />*/}
 				<div className="MusicBar">
 					{/*<Audio 

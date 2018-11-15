@@ -13,6 +13,8 @@
 }
 
 .listItem {
+	/*height: 10vh;*/
+	min-height: 43px;
 	background-color: #0081cc;
 	border: 1px solid #103b59;
 	padding-left: 10px;
@@ -37,6 +39,24 @@
     filter: contrast(0%);
 }
 
+.listItem .title {
+	font-family: 'KoHo', sans-serif;
+	font-size: 20px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline;
+}
+
+
+.listItem .artist {
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 15px;
+	margin: 0px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .listItem .album {
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 15px;
@@ -45,15 +65,30 @@
     text-overflow: ellipsis;
 }
 
-@media screen and (min-width: 480px) {
-.listItem .nowPlayingInd {
-    position: absolute;
-    right: 25px;
-    top: 50%;
-    transform: translate(0%, -50%);
-    color: black;
-    font-size: 30px;
+@media screen and (min-width: 1920px) {
+	.listItem .title {
+		font-size: 180%;
+	}
+
+
+	.listItem .artist {
+		font-size: 120%;
+	}
+
+	.listItem .album {
+		font-size: 120%;
+	}
 }
+
+@media screen and (min-width: 480px) {
+	.listItem .nowPlayingInd {
+	    position: absolute;
+	    right: 25px;
+	    top: 50%;
+	    transform: translate(0%, -50%);
+	    color: black;
+	    font-size: 30px;
+	}
 }
 
 .artistList {
@@ -88,61 +123,41 @@
 
 @media screen and (max-width: 480px) {
 
-.listItem .nowPlayingInd {
-	display: inline;
-	color: black;
-	z-index: 0;
-	font-size: 30px;
-	height: 30px;
-	width: 35px;
-	padding-left: 10px;
-	float: right;
-}
+	.listItem .nowPlayingInd {
+		display: inline;
+		color: black;
+		z-index: 0;
+		font-size: 30px;
+		height: 30px;
+		width: 35px;
+		padding-left: 10px;
+		float: right;
+	}
 
-.listItem .title {
-	font-family: 'KoHo', sans-serif;
-	font-size: 20px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline;
-}
+	.listItem .title {
+		font-family: 'KoHo', sans-serif;
+		font-size: 20px;
+		margin: 0px;
+		overflow: hidden;
+	    text-overflow: ellipsis;
+	    display: inline;
+	}
 
-.listItem .artist {
-	font-family: 'Josefin Sans', sans-serif;
-	font-size: 15px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
-}
+	.listItem .artist {
+		font-family: 'Josefin Sans', sans-serif;
+		font-size: 15px;
+		margin: 0px;
+		overflow: hidden;
+	    text-overflow: ellipsis;
+	}
 
 }
 
 @media screen and (min-width: 480px) {
 
-.listItem .nowPlayingInd {
-	display: inline;
-	color: black;
-	font-size: 30px;
-}
-
-.listItem .title {
-	font-family: 'KoHo', sans-serif;
-	font-size: 20px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline;
-}
-
-
-.listItem .artist {
-	font-family: 'Josefin Sans', sans-serif;
-	font-size: 15px;
-	margin: 0px;
-	overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
+	.listItem .nowPlayingInd {
+		display: inline;
+		color: black;
+		font-size: 30px;
+	}
 }
