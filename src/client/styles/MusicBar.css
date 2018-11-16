@@ -298,6 +298,22 @@
 	.albumart {
 		display: none;
 	}
+
+	.nowPlaying {
+		width: 35vw;
+	}
+
+	.nowPlaying .title {
+		font-size: 100%;
+	}
+
+	.nowPlaying .artist {
+		font-size: 80%;
+	}
+
+	.nowPlaying .album {
+		font-size: 80%;
+	}
 }
 
 @media screen and (max-height: 480px) {
