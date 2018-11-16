@@ -1,5 +1,5 @@
-#Functionality
+# Functionality
 ![](functionality-demo.gif)
 
-#Responsiveness
+# Responsiveness
 ![](responsiveness-demo.gif)
